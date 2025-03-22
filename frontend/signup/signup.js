@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             alert("✅ Registration successful!");
-            window.location.href = "/frontend/frontpage/frontpage.html";
+            window.location.href = "https://ess-a.github.io/LynxEA/frontend/frontpage/frontpage.html";
         } catch (error) {
             console.error("❌ Registration error:", error);
             alert("❌ Registration failed: " + error.message);
