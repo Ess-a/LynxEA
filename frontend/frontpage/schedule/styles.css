@@ -1,0 +1,102 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: beige;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Container */
+main {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    width: 50%;
+    text-align: center;
+}
+
+/* Headings */
+h2 {
+    color: burlywood;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* Form Inputs */
+input, select {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Buttons */
+button {
+    background-color: burlywood;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: burlywood;
+}
+
+/* Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background-color: rgb(201, 167, 122);
+    color: white;
+}
+
+/* Reminder Column */
+.reminder {
+    color: rgb(201, 167, 122);
+    font-weight: bold;
+}
+
+/* Status Column */
+.status-done {
+    color: green;
+    font-weight: bold;
+}
+
+.status-ongoing {
+    color: orange;
+    font-weight: bold;
+}
+
+/* Edit/Delete Buttons */
+td button {
+    background: red;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+td button:hover {
+    background: burlywood;
+}

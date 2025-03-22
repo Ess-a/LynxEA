@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LynxEA</title>
+    <link rel="stylesheet" href="frontpage.css"> <!-- External CSS -->
+</head>
+<body>
+    <header>
+        <h1>Welcome to LynxEA</h1>
+        <div class="profile-menu">
+            <a href="../login/login.html" id="logoutLink">
+                <img src="logout.jpg" alt="Logout" class="icon">
+            </a>            
+        </div>
+    </header>
+    
+    <main>
+        <div class="icon-container">
+            <div class="icon-box" onclick="location.href='schedule/schedule.html'">
+                <img src="create schedule.jpg" alt="Create Schedule">
+                <span>Create Schedule</span>
+            </div>
+            <div class="icon-box" onclick="window.open('https://notegpt.io/pdf-summary')">
+                <img src="summarize a lesson.jpg" alt="Summarize Lesson">
+                <span>Summarize a Lesson</span>
+            </div>            
+            <div class="icon-box" onclick="window.open('https://chatlyai.app/?utm_source=google&utm_medium=cpc&utm_campaign=G_C_Web_GPD_Phil&utm_term=artificial%20intelligence%20online%20chat&utm_campaign=&utm_source=adwords&utm_medium=ppc&hsa_acc=7531877813&hsa_cam=22353055377&hsa_grp=178350096844&hsa_ad=740076667425&hsa_src=g&hsa_tgt=kwd-296420857827&hsa_kw=artificial%20intelligence%20online%20chat&hsa_mt=b&hsa_net=adwords&hsa_ver=3&gad_source=1&gclid=Cj0KCQjwv_m-BhC4ARIsAIqNeBu1bPh3EAwfGjxUMD1dTeE3RaiG_1aC334YlYbfinEArz1IhJ_E_4gaArm-EALw_wcB')">
+                <img src="ask LynxEA.jpg" alt="Summarize Lesson">
+                <span>Ask AI</span>
+            </div>
+            <div class="icon-box" onclick="window.location.href='quiz/QUIZ.html'">
+                <img src="inter elem.jpg" alt="Interactive Elements">
+                <span>QUIZ</span>
+            </div>
+        </div>
+    </main>
+    <script src="http://localhost:5002/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io("http://localhost:5002");
+        socket.on("connect", () => console.log("✅ Connected to WebSocket"));
+    </script>
+    
+    <script src="/frontend/frontpage/schedule/notification.js"></script>
+</body>
+</html>

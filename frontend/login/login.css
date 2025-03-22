@@ -1,0 +1,63 @@
+/* Apply a pastel brown theme */
+body {
+    background-color: #F5E6DA; /* Light beige background */
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Container styling */
+.container {
+    background: #D7B49E; /* Muted pastel brown */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    width: 350px;
+    text-align: center;
+}
+
+/* Form box */
+.form-box h2 {
+    color: #5D4037;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* Input fields */
+.input-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    color: #5D4037;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #BCAAA4;
+    border-radius: 5px;
+}
+
+/* Button */
+button {
+    background-color: #A67B5B;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+}
+
+button:hover {
+    background-color: #8D6E63;
+}

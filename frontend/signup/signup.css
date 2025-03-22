@@ -1,0 +1,71 @@
+/* General Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #F5E6DA; /* Soft pastel brown */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Container */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+}
+
+/* Signup Form Box */
+.form-box {
+    background: #D7B49E; /* Muted pastel brown */
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+/* Input Fields */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.input-group input {
+    width: 90%;
+    padding: 12px;
+    border: 2px solid #A67B5B; /* Pastel brown border */
+    border-radius: 8px;
+    text-align: center;
+    font-size: 16px;
+    outline: none;
+    transition: 0.3s;
+}
+
+.input-group input:focus {
+    border-color: #8D6E63; /* Darker pastel brown */
+}
+
+/* Submit Button */
+button {
+    width: 100%;
+    padding: 12px;
+    background: #A67B5B;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: #8D6E63; /* Darker brown */
+}

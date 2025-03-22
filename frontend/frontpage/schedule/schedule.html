@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LynxEA</title>
+    <link rel="stylesheet" href="schedule.css"> <!-- External CSS -->
+</head>
+<body>
+    
+    <main>
+        <div class="icon-container">
+            <div class="icon-box" onclick="location.href='add.html'">
+                <img src="add.png" alt="Add Schedule">
+                <span>Create Schedule</span>
+            </div>          
+            <div class="icon-box" onclick="location.href='lists.html'">
+                <img src="lists.png" alt="View Lists">
+                <span>See Lists</span>
+            </div>    
+        </div>
+    </main>
+
+    <script>
+        document.getElementById("logoutBtn").addEventListener("click", function () {
+            // Clear session storage (for frontend authentication)
+            sessionStorage.clear();
+    
+            // If using localStorage (optional, for persistent logins)
+            localStorage.removeItem("authToken");
+    
+            // Redirect to the login page
+            window.location.href = "../login/login.html";
+        });
+    </script>    
+    
+    <script src="http://localhost:5002/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io("http://localhost:5002");
+        socket.on("connect", () => console.log("✅ Connected to WebSocket"));
+    </script>
+    
+    <script src="/frontend/frontpage/schedule/notification.js"></script>
+    
+</body>
+</html>

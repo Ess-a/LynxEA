@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Schedule</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <main>
+        <h2>ADD NEW SCHEDULE OF ACTIVITIES</h2>
+
+        <form id="scheduleForm">  <!-- ✅ Fixed ID -->
+            <label>ACTIVITY</label>
+            <input type="text" id="activity" placeholder="Enter activity" required>
+
+            <br><br>
+
+            <label>DEADLINE</label>
+            <input type="datetime-local" id="deadline" required>
+
+            <br><br>
+
+            <label>REMINDER</label>
+            <select id="reminder_interval">  <!-- ✅ Fixed ID -->
+                <option value="1h">1 hour</option>
+                <option value="2h">2 hours</option>
+                <option value="3h">3 hours</option>
+                <option value="4h">4 hours</option>
+                <option value="6h">6 hours</option>
+                <option value="12h">12 hours</option>
+                <option value="24h">24 hours</option>
+            </select>
+
+            <br><br>
+
+            <button type="submit">ADD SCHEDULE</button>  <!-- ✅ Prevents page refresh -->
+        </form>
+
+        <br>
+        <button onclick="location.href='lists.html'">SEE LISTS</button>
+    </main>    
+
+    <!-- ✅ WebSocket (Check if backend supports it) -->
+    <script src="http://localhost:5002/socket.io/socket.io.js"></script>
+    <script>
+        try {
+            const socket = io("http://localhost:5002");
+            socket.on("connect", () => console.log("✅ Connected to WebSocket"));
+        } catch (error) {
+            console.warn("⚠️ WebSocket connection failed:", error);
+        }
+    </script>
+
+    <script src="/frontend/frontpage/schedule/notification.js"></script>
+    <script src="add.js"></script>  <!-- ✅ Load fixed add.js -->
+</body>
+</html>
