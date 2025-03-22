@@ -4,32 +4,28 @@ const bcrypt = require("bcrypt");
 const http = require("http");
 const { Server } = require("socket.io");
 const db = require("./db");
+const connectedUsers = {};
 
 const app = express();
 const server = http.createServer(app);
 
-// ✅ Correct frontend origin (GitHub Pages)
-const FRONTEND_ORIGIN = "https://ess-a.github.io";
+// ✅ Correct frontend origin
+const FRONTEND_ORIGIN = "https://ess-a.github.io"; // ✅ Use the base GitHub Pages URL
 
-// ✅ CORS Configuration (Fixes 'No Access-Control-Allow-Origin' errors)
 app.use(cors({
-    origin: FRONTEND_ORIGIN,  
+    origin: FRONTEND_ORIGIN,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
 }));
 
 // ✅ Handle OPTIONS preflight requests
-app.use((req, res, next) => {
+app.options("*", (req, res) => {
     res.header("Access-Control-Allow-Origin", FRONTEND_ORIGIN);
-    res.header("Access-Control-Allow-Credentials", "true");
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    
-    if (req.method === "OPTIONS") {
-        return res.sendStatus(204);
-    }
-    next();
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.sendStatus(204);
 });
 
 app.use(express.json());
@@ -42,9 +38,22 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
     console.log("🟢 New WebSocket connection:", socket.id);
-    
+
+    socket.on("register", (student_id) => {
+        if (student_id) {
+            socket.student_id = student_id;
+            connectedUsers[student_id] = socket.id;
+            console.log(`✅ Student ${student_id} registered.`);
+        } else {
+            console.warn("⚠️ Invalid student_id during WebSocket registration.");
+        }
+    });
+
     socket.on("disconnect", () => {
-        console.log(`🔴 Disconnected: ${socket.id}`);
+        if (socket.student_id) {
+            delete connectedUsers[socket.student_id];
+            console.log(`🔴 Student ${socket.student_id} disconnected.`);
+        }
     });
 });
 
@@ -57,78 +66,75 @@ db.query("SELECT 1", (err) => {
     }
 });
 
-// ✅ User Registration (Fixing email duplicate issue)
+// ✅ User Registration
 app.post("/api/register", async (req, res) => {
-    const { name, email, password } = req.body;
+    try {
+        const { name, email, password } = req.body;
 
-    if (!name || !email || !password) {
-        return res.status(400).json({ message: "⚠️ Please provide name, email, and password." });
-    }
-
-    // Check if email already exists
-    db.query("SELECT * FROM students WHERE email = ?", [email], async (err, existingStudent) => {
-        if (err) {
-            console.error("❌ Database error:", err);
-            return res.status(500).json({ message: "Server error, please try again." });
+        if (!name || !email || !password) {
+            return res.status(400).json({ message: "⚠️ Please provide name, email, and password." });
         }
 
-        if (existingStudent.length > 0) {
-            return res.status(409).json({ message: "⚠️ Email already exists. Please use a different email." });
-        }
-
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Insert student into database
-        db.query(
-            "INSERT INTO students (name, email, password) VALUES (?, ?, ?)",
-            [name, email, hashedPassword],
-            (err) => {
-                if (err) {
-                    console.error("❌ Database error:", err);
-                    return res.status(500).json({ message: "Server error, please try again." });
-                }
-                console.log(`✅ Student registered: ${email}`);
-                res.status(201).json({ message: "✅ Registration successful!" });
+        // ✅ Check if email already exists (Fixed nested query issue)
+        db.query("SELECT * FROM users WHERE email = ?", [email], async (err, results) => {
+            if (err) {
+                console.error("❌ Database error:", err);
+                return res.status(500).json({ message: "Server error, please try again." });
             }
-        );
-    });
+
+            if (results.length > 0) {
+                return res.status(409).json({ message: "⚠️ Email already exists. Please use a different email." });
+            }
+
+            // ✅ Hash the password before storing it
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            // ✅ Insert user into the database
+            db.query(
+                "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
+                [name, email, hashedPassword],
+                (err) => {
+                    if (err) {
+                        console.error("❌ Database error:", err);
+                        return res.status(500).json({ message: "Server error, please try again." });
+                    }
+                    console.log(`✅ User registered: ${email}`);
+                    res.status(201).json({ message: "✅ Registration successful!" });
+                }
+            );
+        });
+
+    } catch (error) {
+        console.error("❌ Server error:", error);
+        res.status(500).json({ message: "Internal server error." });
+    }
 });
 
-// ✅ Fix Login API (Ensures proper CORS & Error Handling)
+// ✅ User Login
 app.post("/api/login", (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return res.status(400).json({ error: "⚠️ Email and password are required." });
+        return res.status(400).json({ error: "Email and password are required." });
     }
 
-    db.query("SELECT * FROM students WHERE email = ?", [email], (err, results) => {
-        if (err) {
-            console.error("❌ Database error:", err);
-            return res.status(500).json({ error: "Server error, please try again." });
-        }
+    db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
+        if (err) return res.status(500).json({ error: "Database error." });
 
         if (results.length === 0) {
-            console.warn("⚠️ No student found with this email.");
             return res.status(401).json({ error: "Invalid email or password." });
         }
 
-        const student = results[0];
+        const user = results[0];
 
-        bcrypt.compare(password, student.password, (err, isPasswordValid) => {
-            if (err) {
-                console.error("❌ Error verifying password:", err);
-                return res.status(500).json({ error: "Error verifying password." });
-            }
+        bcrypt.compare(password, user.password, (err, isPasswordValid) => {
+            if (err) return res.status(500).json({ error: "Error verifying password." });
 
             if (!isPasswordValid) {
-                console.warn("⚠️ Incorrect password entered.");
                 return res.status(401).json({ error: "Invalid email or password." });
             }
 
-            console.log(`✅ Login successful for student_id: ${student.id}`);
-            res.json({ message: "✅ Login successful!", student_id: student.id });
+            res.json({ message: "✅ Login successful!", user_id: user.id });
         });
     });
 });
