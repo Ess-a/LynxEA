@@ -9,9 +9,9 @@ const app = express();
 const server = http.createServer(app);
 
 // ✅ Correct frontend origin (GitHub Pages)
-const FRONTEND_ORIGIN = "https://ess-a.github.io"; 
+const FRONTEND_ORIGIN = "https://ess-a.github.io";
 
-// ✅ CORS Configuration
+// ✅ CORS Configuration (Fixes 'No Access-Control-Allow-Origin' errors)
 app.use(cors({
     origin: FRONTEND_ORIGIN,  
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -19,7 +19,7 @@ app.use(cors({
     credentials: true
 }));
 
-// ✅ Handle OPTIONS preflight requests globally
+// ✅ Handle OPTIONS preflight requests
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", FRONTEND_ORIGIN);
     res.header("Access-Control-Allow-Credentials", "true");
@@ -40,7 +40,6 @@ const io = new Server(server, {
     cors: { origin: FRONTEND_ORIGIN } 
 });
 
-// ✅ Fix WebSocket Issues
 io.on("connection", (socket) => {
     console.log("🟢 New WebSocket connection:", socket.id);
     
@@ -58,7 +57,7 @@ db.query("SELECT 1", (err) => {
     }
 });
 
-// ✅ User Registration (Fixed)
+// ✅ User Registration (Fixing email duplicate issue)
 app.post("/api/register", async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -96,7 +95,7 @@ app.post("/api/register", async (req, res) => {
     });
 });
 
-// ✅ Fix Login API (Ensure Proper CORS & Error Handling)
+// ✅ Fix Login API (Ensures proper CORS & Error Handling)
 app.post("/api/login", (req, res) => {
     const { email, password } = req.body;
 
