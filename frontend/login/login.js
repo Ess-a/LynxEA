@@ -10,26 +10,39 @@ document.getElementById("loginForm").addEventListener("submit", async function (
     }
 
     try {
-        const response = await fetch("http://localhost:5002/api/login", {
+        const API_URL = "http://localhost:5002/api/login"; // Change if deploying
+        console.log(`🔍 Sending login request to: ${API_URL}`);
+
+        const response = await fetch(API_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            credentials: "include",
+            credentials: "include", // ✅ Only needed if using cookies
             body: JSON.stringify({ email, password })
         });
 
+        // ✅ Handle response status
         if (!response.ok) {
-            const errorData = await response.json();
-            alert("❌ Login failed: " + errorData.error);
+            let errorMessage = "❌ Login failed.";
+            try {
+                const errorData = await response.json();
+                errorMessage = errorData.error || errorMessage;
+            } catch (err) {
+                console.warn("⚠️ Error parsing JSON:", err);
+            }
+            alert(errorMessage);
             return;
         }
 
+        // ✅ Parse and store student ID
         const data = await response.json();
+        console.log("✅ Login success:", data);
         localStorage.setItem("student_id", data.student_id);
-        alert("✅ Login successful!");
 
+        alert("✅ Login successful!");
         window.location.href = "/frontend/frontpage/frontpage.html"; 
 
     } catch (error) {
-        alert("❌ Network error, please try again.");
+        console.error("❌ Network error:", error);
+        alert("❌ Network error, please check your internet or backend server.");
     }
 });
