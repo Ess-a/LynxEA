@@ -4,45 +4,44 @@ const bcrypt = require("bcrypt");
 const http = require("http");
 const { Server } = require("socket.io");
 const db = require("./db");
-const connectedUsers = {}; // ✅ Ensure it's always an object
+const connectedUsers = {};
 
 const app = express();
 const server = http.createServer(app);
 
-// ✅ Define allowed frontend origins
-const FRONTEND_ORIGINS = [
-    "http://127.0.0.1:5500",
-    "http://localhost:5500",
-    "http://localhost:3000",
-    "https://ess-a.github.io" // ✅ Ensure GitHub Pages access
-];
+// ✅ Correct frontend origin
+const FRONTEND_ORIGIN = "https://ess-a.github.io"; // ✅ Use the base GitHub Pages URL
 
-// ✅ CORS Configuration
 app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || FRONTEND_ORIGINS.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error("CORS not allowed"));
-        }
-    },
+    origin: FRONTEND_ORIGIN,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
 }));
 
+// ✅ Handle OPTIONS preflight requests
+app.options("*", (req, res) => {
+    res.header("Access-Control-Allow-Origin", FRONTEND_ORIGIN);
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.sendStatus(204);
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ✅ WebSocket Setup
-const io = new Server(server, { cors: { origin: FRONTEND_ORIGINS } });
+const io = new Server(server, { 
+    cors: { origin: FRONTEND_ORIGIN } 
+});
 
 io.on("connection", (socket) => {
     console.log("🟢 New WebSocket connection:", socket.id);
 
     socket.on("register", (student_id) => {
         if (student_id) {
-            socket.student_id = student_id; // ✅ Store the ID in socket
+            socket.student_id = student_id;
             connectedUsers[student_id] = socket.id;
             console.log(`✅ Student ${student_id} registered.`);
         } else {
@@ -76,21 +75,21 @@ app.post("/api/register", async (req, res) => {
             return res.status(400).json({ message: "⚠️ Please provide name, email, and password." });
         }
 
-        // Check if email already exists
-        db.query("SELECT * FROM users WHERE email = ?", [email], async (err, existingUser) => {
+        // ✅ Check if email already exists (Fixed nested query issue)
+        db.query("SELECT * FROM users WHERE email = ?", [email], async (err, results) => {
             if (err) {
                 console.error("❌ Database error:", err);
                 return res.status(500).json({ message: "Server error, please try again." });
             }
 
-            if (existingUser.length > 0) {
+            if (results.length > 0) {
                 return res.status(409).json({ message: "⚠️ Email already exists. Please use a different email." });
             }
 
-            // Hash the password
+            // ✅ Hash the password before storing it
             const hashedPassword = await bcrypt.hash(password, 10);
 
-            // Insert user into database
+            // ✅ Insert user into the database
             db.query(
                 "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
                 [name, email, hashedPassword],
@@ -111,7 +110,7 @@ app.post("/api/register", async (req, res) => {
     }
 });
 
-// ✅ FIXED: User Login (Changed `students` to `users`)
+// ✅ User Login
 app.post("/api/login", (req, res) => {
     const { email, password } = req.body;
 
