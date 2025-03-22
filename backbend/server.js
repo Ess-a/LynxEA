@@ -4,16 +4,18 @@ const bcrypt = require("bcrypt");
 const http = require("http");
 const { Server } = require("socket.io");
 const db = require("./db");
-const connectedUsers = {};
+
+const connectedUsers = {}; // ✅ Ensure connectedUsers is an object
 
 const app = express();
 const server = http.createServer(app);
 
-// ✅ Correct frontend origin
-const FRONTEND_ORIGIN = "https://ess-a.github.io"; // ✅ Use the base GitHub Pages URL
+// ✅ Correct frontend origin (GitHub Pages)
+const FRONTEND_ORIGIN = "https://ess-a.github.io"; 
 
+// ✅ CORS Configuration
 app.use(cors({
-    origin: FRONTEND_ORIGIN,
+    origin: FRONTEND_ORIGIN,  
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
@@ -66,54 +68,42 @@ db.query("SELECT 1", (err) => {
     }
 });
 
-// ✅ User Registration
+// ✅ User Registration (Fixed)
 app.post("/api/register", async (req, res) => {
-    try {
-        const { name, email, password } = req.body;
+    const { name, email, password } = req.body;
 
-        if (!name || !email || !password) {
-            return res.status(400).json({ message: "⚠️ Please provide name, email, and password." });
+    if (!name || !email || !password) {
+        return res.status(400).json({ message: "⚠️ Please provide name, email, and password." });
+    }
+
+    // Check if email already exists
+    db.query("SELECT * FROM students WHERE email = ?", [email], async (err, existingStudent) => {
+        if (err) {
+            console.error("❌ Database error:", err);
+            return res.status(500).json({ message: "Server error, please try again." });
         }
 
-        // Check if email already exists in the `students` table
-        db.query("SELECT * FROM students WHERE email = ?", [email], async (err, existingStudent) => {
-            if (err) {
-                console.error("❌ Database error:", err);
-                return res.status(500).json({ message: "Server error, please try again." });
-            }
+        if (existingStudent.length > 0) {
+            return res.status(409).json({ message: "⚠️ Email already exists. Please use a different email." });
+        }
 
-            if (existingStudent.length > 0) {
-                return res.status(409).json({ message: "⚠️ Email already exists. Please use a different email." });
-            }
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-            // Hash the password
-            const hashedPassword = await bcrypt.hash(password, 10);
-
-            // Insert student into database
-            db.query(
-                "INSERT INTO students (name, email, password) VALUES (?, ?, ?)",
-                [name, email, hashedPassword],
-                (err) => {
-                    if (err) {
-                        console.error("❌ Database error:", err);
-                        return res.status(500).json({ message: "Server error, please try again." });
-                    }
-                    console.log(`✅ Student registered: ${email}`);
-                    res.status(201).json({ message: "✅ Registration successful!" });
+        // Insert student into database
+        db.query(
+            "INSERT INTO students (name, email, password) VALUES (?, ?, ?)",
+            [name, email, hashedPassword],
+            (err) => {
+                if (err) {
+                    console.error("❌ Database error:", err);
+                    return res.status(500).json({ message: "Server error, please try again." });
                 }
-            );
-        });
-
-    } catch (error) {
-        console.error("❌ Server error:", error);
-        res.status(500).json({ message: "Internal server error." });
-    }
-});
-
-    } catch (error) {
-        console.error("❌ Server error:", error);
-        res.status(500).json({ message: "Internal server error." });
-    }
+                console.log(`✅ Student registered: ${email}`);
+                res.status(201).json({ message: "✅ Registration successful!" });
+            }
+        );
+    });
 });
 
 // ✅ User Login
