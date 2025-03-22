@@ -9,27 +9,32 @@ document.getElementById("loginForm").addEventListener("submit", async function (
         return;
     }
 
+    console.log("🔍 Sending login request to:", "https://lynxea.onrender.com/api/login"); // ✅ Logs backend URL
+
     try {
-        const response = await fetch("https://lynxea.onrender.com/api/login", { // ✅ Use Render URL
+        const response = await fetch("https://lynxea.onrender.com/api/login", { // ✅ Use Render backend URL
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
             body: JSON.stringify({ email, password })
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
-            const errorData = await response.json();
-            alert("❌ Login failed: " + errorData.error);
+            console.warn("⚠️ Login failed:", data.error);
+            alert("❌ Login failed: " + data.error);
             return;
         }
 
-        const data = await response.json();
+        console.log("✅ Login successful!", data);
         localStorage.setItem("user_id", data.user_id);
         alert("✅ Login successful!");
 
         window.location.href = "/frontend/frontpage/frontpage.html"; 
 
     } catch (error) {
+        console.error("❌ Network error:", error);
         alert("❌ Network error, please try again.");
     }
 });
