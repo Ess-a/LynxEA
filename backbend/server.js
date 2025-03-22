@@ -115,25 +115,35 @@ app.post("/api/login", (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return res.status(400).json({ error: "Email and password are required." });
+        return res.status(400).json({ error: "⚠️ Email and password are required." });
     }
 
     db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
-        if (err) return res.status(500).json({ error: "Database error." });
+        if (err) {
+            console.error("❌ Database error:", err);
+            return res.status(500).json({ error: "Server error, please try again." });
+        }
 
         if (results.length === 0) {
+            console.warn("⚠️ No user found with this email.");
             return res.status(401).json({ error: "Invalid email or password." });
         }
 
         const user = results[0];
 
+        // ✅ Compare hashed password properly
         bcrypt.compare(password, user.password, (err, isPasswordValid) => {
-            if (err) return res.status(500).json({ error: "Error verifying password." });
+            if (err) {
+                console.error("❌ Error verifying password:", err);
+                return res.status(500).json({ error: "Error verifying password." });
+            }
 
             if (!isPasswordValid) {
+                console.warn("⚠️ Incorrect password entered.");
                 return res.status(401).json({ error: "Invalid email or password." });
             }
 
+            console.log(`✅ Login successful for user_id: ${user.id}`);
             res.json({ message: "✅ Login successful!", user_id: user.id });
         });
     });
