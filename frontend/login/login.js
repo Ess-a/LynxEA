@@ -10,9 +10,9 @@ document.getElementById("loginForm").addEventListener("submit", async function (
     }
 
     try {
-        console.log("🔍 Sending login request to:", "https://lynxea.onrender.com/api/login");
+        console.log("🔍 Sending login request to:", "https://localhost:5002/api/login");
 
-        const response = await fetch("https://lynxea.onrender.com/api/login", {
+        const response = await fetch("https://localhost:5002/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include", // ✅ Enable CORS credentials
