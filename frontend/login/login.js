@@ -10,39 +10,26 @@ document.getElementById("loginForm").addEventListener("submit", async function (
     }
 
     try {
-        const API_URL = "http://localhost:5002/api/login"; // Change if deploying
-        console.log(`🔍 Sending login request to: ${API_URL}`);
-
-        const response = await fetch(API_URL, {
+        const response = await fetch("https://lynxea.onrender.com/api/login", { // ✅ Use Render URL
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            credentials: "include", // ✅ Only needed if using cookies
+            credentials: "include",
             body: JSON.stringify({ email, password })
         });
 
-        // ✅ Handle response status
         if (!response.ok) {
-            let errorMessage = "❌ Login failed.";
-            try {
-                const errorData = await response.json();
-                errorMessage = errorData.error || errorMessage;
-            } catch (err) {
-                console.warn("⚠️ Error parsing JSON:", err);
-            }
-            alert(errorMessage);
+            const errorData = await response.json();
+            alert("❌ Login failed: " + errorData.error);
             return;
         }
 
-        // ✅ Parse and store student ID
         const data = await response.json();
-        console.log("✅ Login success:", data);
-        localStorage.setItem("student_id", data.student_id);
-
+        localStorage.setItem("user_id", data.user_id);
         alert("✅ Login successful!");
+
         window.location.href = "/frontend/frontpage/frontpage.html"; 
 
     } catch (error) {
-        console.error("❌ Network error:", error);
-        alert("❌ Network error, please check your internet or backend server.");
+        alert("❌ Network error, please try again.");
     }
 });
