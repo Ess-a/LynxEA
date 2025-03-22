@@ -28,7 +28,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
         }
 
         console.log("✅ Login successful!", data);
-        localStorage.setItem("user_id", data.user_id);
+        localStorage.setItem("student_id", data.student_id); // ✅ Store student_id
         alert("✅ Login successful!");
 
         window.location.href = "/frontend/frontpage/frontpage.html"; 
