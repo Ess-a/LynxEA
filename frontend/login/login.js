@@ -9,29 +9,27 @@ document.getElementById("loginForm").addEventListener("submit", async function (
         return;
     }
 
-    console.log("🔍 Sending login request to:", "https://lynxea.onrender.com/api/login"); // ✅ Logs backend URL
-
     try {
-        const response = await fetch("https://lynxea.onrender.com/api/login", { // ✅ Use Render backend URL
+        console.log("🔍 Sending login request to:", "https://lynxea.onrender.com/api/login");
+
+        const response = await fetch("https://lynxea.onrender.com/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            credentials: "include",
+            credentials: "include", // ✅ Enable CORS credentials
             body: JSON.stringify({ email, password })
         });
 
-        const data = await response.json();
-
         if (!response.ok) {
-            console.warn("⚠️ Login failed:", data.error);
-            alert("❌ Login failed: " + data.error);
+            const errorData = await response.json();
+            alert("❌ Login failed: " + errorData.error);
             return;
         }
 
-        console.log("✅ Login successful!", data);
-        localStorage.setItem("student_id", data.student_id); // ✅ Store student_id
+        const data = await response.json();
+        localStorage.setItem("user_id", data.user_id); // ✅ Store user ID
         alert("✅ Login successful!");
 
-        window.location.href = "https://ess-a.github.io/LynxEA/frontend/frontpage/frontpage.html"; 
+        window.location.href = "/frontend/frontpage/frontpage.html";
 
     } catch (error) {
         console.error("❌ Network error:", error);
