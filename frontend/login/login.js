@@ -31,7 +31,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
         localStorage.setItem("student_id", data.student_id); // ✅ Store student_id
         alert("✅ Login successful!");
 
-        window.location.href = "/LynxEA/frontend/frontpage/frontpage.html"; 
+        window.location.href = "https://ess-a.github.io/LynxEA/frontend/frontpage/frontpage.html"; 
 
     } catch (error) {
         console.error("❌ Network error:", error);
