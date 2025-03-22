@@ -5,8 +5,6 @@ const http = require("http");
 const { Server } = require("socket.io");
 const db = require("./db");
 
-const connectedUsers = {}; // ✅ Ensure connectedUsers is an object
-
 const app = express();
 const server = http.createServer(app);
 
@@ -21,13 +19,17 @@ app.use(cors({
     credentials: true
 }));
 
-// ✅ Handle OPTIONS preflight requests
-app.options("*", (req, res) => {
+// ✅ Handle OPTIONS preflight requests globally
+app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", FRONTEND_ORIGIN);
+    res.header("Access-Control-Allow-Credentials", "true");
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.header("Access-Control-Allow-Credentials", "true");
-    res.sendStatus(204);
+    
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(204);
+    }
+    next();
 });
 
 app.use(express.json());
@@ -38,24 +40,12 @@ const io = new Server(server, {
     cors: { origin: FRONTEND_ORIGIN } 
 });
 
+// ✅ Fix WebSocket Issues
 io.on("connection", (socket) => {
     console.log("🟢 New WebSocket connection:", socket.id);
-
-    socket.on("register", (student_id) => {
-        if (student_id) {
-            socket.student_id = student_id;
-            connectedUsers[student_id] = socket.id;
-            console.log(`✅ Student ${student_id} registered.`);
-        } else {
-            console.warn("⚠️ Invalid student_id during WebSocket registration.");
-        }
-    });
-
+    
     socket.on("disconnect", () => {
-        if (socket.student_id) {
-            delete connectedUsers[socket.student_id];
-            console.log(`🔴 Student ${socket.student_id} disconnected.`);
-        }
+        console.log(`🔴 Disconnected: ${socket.id}`);
     });
 });
 
@@ -106,7 +96,7 @@ app.post("/api/register", async (req, res) => {
     });
 });
 
-// ✅ User Login
+// ✅ Fix Login API (Ensure Proper CORS & Error Handling)
 app.post("/api/login", (req, res) => {
     const { email, password } = req.body;
 
@@ -127,7 +117,6 @@ app.post("/api/login", (req, res) => {
 
         const student = results[0];
 
-        // ✅ Compare hashed password properly
         bcrypt.compare(password, student.password, (err, isPasswordValid) => {
             if (err) {
                 console.error("❌ Error verifying password:", err);
