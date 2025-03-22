@@ -10,13 +10,13 @@ document.getElementById("loginForm").addEventListener("submit", async function (
     }
 
     try {
-        console.log("🔍 Sending login request to:", "https://localhost:5002/api/login");
+        const backendURL = "https://lynxea.onrender.com/api/login"; // ✅ Correct Backend URL
+        console.log("🔍 Sending login request to:", backendURL);
 
-        const response = await fetch("https://localhost:5002/api/login", {
+        const response = await fetch(backendURL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            credentials: "include", // ✅ Enable CORS credentials
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ email, password }) // 🔹 Removed `credentials: "include"`
         });
 
         if (!response.ok) {
@@ -29,7 +29,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
         localStorage.setItem("user_id", data.user_id); // ✅ Store user ID
         alert("✅ Login successful!");
 
-        window.location.href = "/frontend/frontpage/frontpage.html";
+        window.location.href = "/frontend/frontpage/frontpage.html"; // ✅ Redirect to dashboard
 
     } catch (error) {
         console.error("❌ Network error:", error);
